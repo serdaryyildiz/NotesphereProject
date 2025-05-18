@@ -1,0 +1,25 @@
+steps:
+  - name: 'maven:3.8.5-openjdk-17'
+    entrypoint: 'mvn'
+    args: ['clean', 'package', '-DskipTests']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'europe-west1-docker.pkg.dev/sylvan-bonbon-460123/notesphere/notesphere-app', '.']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'europe-west1-docker.pkg.dev/sylvan-bonbon-460123/notesphere/notesphere-app']
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'notesphere-app'
+      - '--image'
+      - 'europe-west1-docker.pkg.dev/sylvan-bonbon-460123/notesphere/notesphere-app'
+      - '--region'
+      - 'europe-west1'
+      - '--allow-unauthenticated'
+
+images:
+  - 'europe-west1-docker.pkg.dev/sylvan-bonbon-460123/notesphere/notesphere-app
